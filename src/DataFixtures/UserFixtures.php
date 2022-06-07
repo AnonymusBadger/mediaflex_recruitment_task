@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserFixtures extends Fixture
 {
@@ -12,30 +13,47 @@ class UserFixtures extends Fixture
     public const MODERATOR_USER_REFERENCE = 'moderator-user';
     public const USER_USER_REFERENCE = 'user-user';
 
+    /** @var UserPasswordHasherInterface */
+    private $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $userPasswordHasher)
+    {
+        $this->passwordHasher = $userPasswordHasher;
+    }
+
     public function load(ObjectManager $manager)
     {
-        $admin = new User();
-        $admin->setEmail('admin@user.com');
-        $admin->setRoles(['ROLE_ADMIN']);
-        $admin->setPassword('admin');
-        $manager->persist($admin);
+        $users = [
+            [
+                'ref' => self::ADMIN_USER_REFERENCE,
+                'email' => 'admin@user.com',
+                'password' => 'pass',
+                'roles' => ['ROLE_ADMIN'],
+            ],
+            [
+                'ref' => self::MODERATOR_USER_REFERENCE,
+                'email' => 'moderator@user.com',
+                'password' => 'pass',
+                'roles' => ['ROLE_MODERATOR'],
+            ],
+            [
+                'ref' => self::USER_USER_REFERENCE,
+                'email' => 'user@user.com',
+                'password' => 'pass',
+                'roles' => ['ROLE_USER'],
+            ]
+        ];
 
-        $moderator = new User();
-        $moderator->setEmail('moderator@user.com');
-        $moderator->setRoles(['ROLE_MODERATOR']);
-        $moderator->setPassword('moderator');
-        $manager->persist($moderator);
+        foreach ($users as $userData) {
+            $user = new User();
+            $user->setEmail($userData['email']);
+            $user->setRoles($userData['roles']);
+            $user->setPassword($this->passwordHasher->hashPassword($user, $userData['password']));
+            $manager->persist($user);
 
-        $user = new User();
-        $user->setEmail('user@user.com');
-        $user->setRoles(['ROLE_USER']);
-        $user->setPassword('user');
-        $manager->persist($user);
+            $this->addReference($userData['ref'], $user);
+        }
 
         $manager->flush();
-
-        $this->addReference(self::ADMIN_USER_REFERENCE, $admin);
-        $this->addReference(self::MODERATOR_USER_REFERENCE, $moderator);
-        $this->addReference(self::USER_USER_REFERENCE, $user);
     }
 }
