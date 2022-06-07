@@ -9,11 +9,6 @@ use Doctrine\Persistence\ObjectManager;
 
 class ApplicationFixtures extends Fixture implements DependentFixtureInterface
 {
-    public const WITH_ADMIN_REFERENCE = 'with-admin';
-    public const WITH_MODERATOR_REFERENCE = 'with-moderator';
-    public const WITH_USER_REFERENCE = 'with-user';
-    public const WITHOUT_ANY_REFERENCE = 'without-any';
-
     public function load(ObjectManager $manager)
     {
         $withAdmin = new Application();
@@ -31,15 +26,17 @@ class ApplicationFixtures extends Fixture implements DependentFixtureInterface
         $withUser->addUser($this->getReference(UserFixtures::USER_USER_REFERENCE));
         $manager->persist($withUser);
 
+        $withMany = new Application();
+        $withMany->setName('AppWithMany');
+        $withMany->addUser($this->getReference(UserFixtures::MODERATOR_USER_REFERENCE));
+        $withMany->addUser($this->getReference(UserFixtures::USER_USER_REFERENCE));
+        $manager->persist($withMany);
+
         $without = new Application();
         $without->setName('AppWithoutAny');
         $manager->persist($without);
 
         $manager->flush();
-
-        $this->addReference(self::WITH_ADMIN_REFERENCE, $withModerator);
-        $this->addReference(self::WITH_MODERATOR_REFERENCE, $withModerator);
-        $this->addReference(self::WITH_USER_REFERENCE, $withUser);
     }
 
     public function getDependencies()

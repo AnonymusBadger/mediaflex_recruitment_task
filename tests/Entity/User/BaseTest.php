@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class BaseTest extends TestCase
 {
-    /** @param User */
+    /** @var User */
     private $user;
 
     protected function setUp(): void
@@ -16,19 +16,14 @@ class BaseTest extends TestCase
         $this->user = new User();
     }
 
-    public function testUserHasSetRole(): void
-    {
-        $this->assertTrue(method_exists($this->user, 'setRole'));
-    }
-
     /**
      * @test
      * @dataProvider provideUserData
      */
-    public function testUserCanSetRole($username, $role): void
+    public function testUserCanSetRole($username, $roles): void
     {
-        $this->user->setRole($role);
-        $this->assertEquals($role, $this->user->getRole());
+        $this->user->setRoles($roles);
+        $this->assertEquals($roles, $this->user->getRoles());
     }
 
     public function testUserCanAddApplications(): void
@@ -46,19 +41,27 @@ class BaseTest extends TestCase
 
     public function provideUserData()
     {
-        // [[$username, $role]]
+        // [[$username, $roles[]]]
         return [
             [
                 'test@test.com',
-                'ROLE_ADMIN',
+                [
+                    'ROLE_ADMIN',
+                    'ROLE_USER'
+                ]
             ],
             [
                 'test@test.com',
-                'ROLE_MODERATOR',
+                [
+                    'ROLE_MODERATOR',
+                    'ROLE_USER'
+                ]
             ],
             [
                 'test@test.com',
-                'ROLE_USER',
+                [
+                    'ROLE_USER',
+                ]
             ],
         ];
     }

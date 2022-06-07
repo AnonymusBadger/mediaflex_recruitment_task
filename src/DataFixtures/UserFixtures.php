@@ -16,17 +16,20 @@ class UserFixtures extends Fixture
     {
         $admin = new User();
         $admin->setEmail('admin@user.com');
-        $admin->setRole('ROLE_ADMIN');
+        $admin->setRoles(['ROLE_ADMIN']);
+        $admin->setPassword('admin');
         $manager->persist($admin);
 
         $moderator = new User();
         $moderator->setEmail('moderator@user.com');
-        $moderator->setRole('ROLE_MODERATOR');
+        $moderator->setRoles(['ROLE_MODERATOR']);
+        $moderator->setPassword('moderator');
         $manager->persist($moderator);
 
         $user = new User();
         $user->setEmail('user@user.com');
-        $user->setRole('ROLE_USER');
+        $user->setRoles(['ROLE_USER']);
+        $user->setPassword('user');
         $manager->persist($user);
 
         $manager->flush();
