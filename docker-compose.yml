@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  database:
+    container_name: mediaflex-MySQL
+    image: "mysql:8"
+    environment:
+      MYSQL_DATABASE: main
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306"
+
+  phpmyadmin:
+    container_name: mediaflex-PhpMyAdmin
+    image: phpmyadmin
+    links:
+      - database
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_HOST=database
+      - PMA_PORT=3306
+      - PMA_ARBITRARY=1
+
+volumes:
+  db-data:
+    name: mediaflex-Database
