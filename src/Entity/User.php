@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
-    itemOperations: ['patch']
+    attributes: ['security' => 'is_granted(["ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER"])'],
 )]
 class User
 {
