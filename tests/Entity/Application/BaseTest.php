@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Tests\TestCase\Entity;
+namespace App\Tests\Entity\Application;
 
 use App\Entity\Application;
 use App\Entity\User;
 use PHPUnit\Framework\TestCase;
 
-class ApplicationTest extends TestCase
+class BaseTest extends TestCase
 {
     /** @param Application */
     private $app;

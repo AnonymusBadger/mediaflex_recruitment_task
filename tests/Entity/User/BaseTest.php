@@ -6,7 +6,7 @@ use App\Entity\Application;
 use App\Entity\User;
 use PHPUnit\Framework\TestCase;
 
-class UserTest extends TestCase
+class BaseTest extends TestCase
 {
     /** @param User */
     private $user;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\KernelTestCase\Entity;
+namespace App\Tests\Entity\User;
 
 use App\Entity\Application;
 use App\Entity\User;
@@ -10,7 +10,7 @@ use App\Tests\DatabasePrimer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class ApplicationTest extends KernelTestCase
+class KernelTest extends KernelTestCase
 {
     /** @var EntityManagerInterface */
     private $entityManager;
