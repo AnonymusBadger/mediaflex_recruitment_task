@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Entity\User;
+namespace App\Tests\Application\User;
 
 use App\Entity\Application;
 use App\Entity\User;
@@ -53,35 +53,15 @@ class KernelTest extends KernelTestCase
 
     public function testItCanCheckIfAppHasUser()
     {
-        $this->assertTrue(method_exists($this->appsRepo, 'appHasUser'));
+        $this->assertTrue(method_exists($this->appsRepo, 'getRole'));
 
-        // Check if objects accepted
-        $app = $this->appsRepo->findByName('AppWithUser');
-        $user = $this->usersRepo->findOneBy(['email' => 'user@user.com']);
+        $role = $this->appsRepo->getRole('AppWithMany', 'user@user.com');
+        $this->assertSame('ROLE_USER', $role);
 
-        $result = $this->appsRepo->appHasUser($app, $user);
+        $role = $this->appsRepo->getRole('AppWithMany', 'moderator@user.com');
+        $this->assertSame('ROLE_MODERATOR', $role);
 
-        $this->assertSame([
-            'hasAccess' => true,
-            'role' => 'ROLE_USER'
-        ], $result);
-
-        // Check if strings accepted
-        $result = $this->appsRepo->appHasUser('AppWithUser', 'user@user.com');
-
-        $this->assertIsArray($result);
-        $this->assertSame([
-            'hasAccess' => true,
-            'role' => 'ROLE_USER'
-        ], $result);
-
-        // Check user not found
-        $result = $this->appsRepo->appHasUser('AppWithUser', 'blah');
-
-        $this->assertIsArray($result);
-        $this->assertSame([
-            'hasAccess' => false,
-            'role' => null
-        ], $result);
+        $role = $this->appsRepo->getRole('AppWithMany', 'admin@user.com');
+        $this->assertNull($role);
     }
 }

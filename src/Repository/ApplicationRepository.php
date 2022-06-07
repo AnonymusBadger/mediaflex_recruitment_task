@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Application;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Persistence\ManagerRegistry;
 
 use function PHPUnit\Framework\isInstanceOf;
@@ -42,32 +43,33 @@ class ApplicationRepository extends ServiceEntityRepository
         }
     }
 
-    public function appHasUser(Application | string $app, User | string $user)
+    public function getRole(Application | string $app, User | string $user)
     {
         $appName = is_string($app) ? $app : $app->getName();
         $userEmail = is_string($user) ? $user : $user->getEmail();
 
-        $dql = sprintf(
+        $sql = sprintf(
             "
-            SELECT u.role
-            FROM %s a
-            JOIN a.users u
-            WHERE a.name = '%s' AND u.email = '%s'
+            SELECT u.roles
+            FROM user u
+            JOIN user_application ua ON u.id = ua.user_id
+            JOIN application a ON ua.application_id = a.id
+            WHERE  a.name = '%s' AND u.email = '%s';
             ",
-            Application::class,
             $appName,
-            $userEmail,
+            $userEmail
         );
 
-        $role = $this
-            ->getEntityManager()
-            ->createQuery($dql)
-            ->getOneOrNullResult();
 
-        return [
-            'hasAccess' => $role ? true : false,
-            'role' => $role ? $role['role'] : null,
-        ];
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('roles', 'roles');
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $result = $query->getScalarResult();
+
+        if (empty($result)) return null;
+
+        return json_decode($result[0]['roles'])[0];
     }
 
     public function findByName(string $name)
@@ -88,29 +90,4 @@ class ApplicationRepository extends ServiceEntityRepository
             ->createQuery($dql)
             ->getOneOrNullResult();
     }
-
-    //    /**
-    //     * @return Application[] Returns an array of Application objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Application
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }
