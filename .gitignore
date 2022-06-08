@@ -22,3 +22,7 @@
 ###> local
 .dir-locals.el
 ###< local
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
