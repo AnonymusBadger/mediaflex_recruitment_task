@@ -13,6 +13,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
     attributes: ['security' => 'is_granted(["ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER"])'],
+    collectionOperations: [
+        'get' => ['security' => 'is_granted(["ROLE_ADMIN", "ROLE_MODERATOR"])'],
+        'post' => ['security' => 'is_granted(["ROLE_ADMIN"])'],
+    ],
+    itemOperations: []
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {

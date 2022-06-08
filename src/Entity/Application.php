@@ -10,7 +10,11 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ApplicationRepository::class)]
 #[ApiResource(
-    collectionOperations: ['get', 'post'],
+    attributes: ['security' => 'is_granted(["ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER"])'],
+    collectionOperations: [
+        'get' => ['security' => 'is_granted(["ROLE_ADMIN", "ROLE_MODERATOR"])'],
+        'post' => ['security' => 'is_granted(["ROLE_ADMIN"])'],
+    ],
     itemOperations: []
 )]
 class Application
