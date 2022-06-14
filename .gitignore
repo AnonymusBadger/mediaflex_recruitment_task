@@ -21,6 +21,7 @@
 
 ###> local
 .dir-locals.el
+/.log/
 ###< local
 
 ###> lexik/jwt-authentication-bundle ###
