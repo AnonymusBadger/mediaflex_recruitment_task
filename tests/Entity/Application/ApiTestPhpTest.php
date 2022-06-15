@@ -51,10 +51,6 @@ class ApiTestPhpTest extends CustomApiTestCase
                 $this->assertResponseIsSuccessful();
         }
 
-        public function testUpdateApplication(): void
-        {
-        }
-
         public function testAddUser(): void
         {
                 $token = $this->getToken('admin@user.com');
@@ -84,13 +80,111 @@ class ApiTestPhpTest extends CustomApiTestCase
                 // Add user to app
                 $appAddUserUrl = 'api/applications/' . $appData['id'] . '/add_user';
 
-                $client->request('POST', $appAddUserUrl, [
+                $client->request('PATCH', $appAddUserUrl, [
+                        'headers' => ['Content-Type' => 'application/merge-patch+json'],
                         'json' => [
                                 'user' => $userData['@id'],
                         ]
                 ]);
 
                 $this->assertResponseIsSuccessful();
+        }
+
+        public function testCheckAccess(): void
+        {
+                $token = $this->getToken('admin@user.com');
+                $client = $this->createClientWithCredentials($token);
+
+                // Create user1
+                $client->request('POST', 'api/users', [
+                        'json' => [
+                                'email' => 'user1@user.com',
+                                'password' => 'pass'
+                        ]
+                ]);
+                $this->assertResponseIsSuccessful();
+
+                $user1Data = $client->getResponse()->toArray();
+
+                // Create user2
+                $client->request('POST', 'api/users', [
+                        'json' => [
+                                'email' => 'user2@user.com',
+                                'password' => 'pass',
+                                'roles' => ['ROLE_MODERATOR']
+                        ]
+                ]);
+                $this->assertResponseIsSuccessful();
+
+                $user2Data = $client->getResponse()->toArray();
+
+                // Create app
+                $client->request('POST', 'api/applications', [
+                        'json' => [
+                                'name' => 'foo',
+                        ]
+                ]);
+                $this->assertResponseIsSuccessful();
+
+                $appData = $client->getResponse()->toArray();
+
+                // Add users to app
+                $appAddUserUrl = 'api/applications/' . $appData['id'] . '/add_user';
+
+                $client->request('PATCH', $appAddUserUrl, [
+                        'headers' => ['Content-Type' => 'application/merge-patch+json'],
+                        'json' => [
+                                'user' => $user1Data['@id'],
+                        ]
+                ]);
+                $this->assertResponseIsSuccessful();
+
+                $client->request('PATCH', $appAddUserUrl, [
+                        'headers' => ['Content-Type' => 'application/merge-patch+json'],
+                        'json' => [
+                                'user' => $user2Data['@id'],
+                        ]
+                ]);
+                $this->assertResponseIsSuccessful();
+
+                // Get role normal user
+                $appHasAccessUrl = 'api/applications/' . $appData['id'] . '/user_has_access';
+
+                $client->request('POST', $appHasAccessUrl, [
+                        'json' => [
+                                'email' => $user1Data['email'],
+                        ]
+                ]);
+                $this->assertResponseIsSuccessful();
+
+                $this->assertJsonContains([
+                        'hasAccess' => true,
+                        'roles' => ['ROLE_USER']
+                ]);
+
+                // Get role moderator user
+                $client->request('POST', $appHasAccessUrl, [
+                        'json' => [
+                                'email' => $user2Data['email'],
+                        ]
+                ]);
+                $this->assertResponseIsSuccessful();
+
+                $this->assertJsonContains([
+                        'hasAccess' => true,
+                        'roles' => ['ROLE_MODERATOR']
+                ]);
+
+                // Get role no user
+                $client->request('POST', $appHasAccessUrl, [
+                        'json' => [
+                                'email' => 'foo',
+                        ]
+                ]);
+                $this->assertResponseIsSuccessful();
+                $this->assertJsonContains([
+                        'hasAccess' => false,
+                ]);
         }
 
         public function testGetApplication(): void

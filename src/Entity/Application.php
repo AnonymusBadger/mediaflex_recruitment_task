@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\Api\AppAddUserController;
+use App\Controller\Api\AppUserHasAccessController;
 use App\Repository\ApplicationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -27,11 +28,32 @@ use Symfony\Component\Validator\Constraints as Assert;
             'security' => 'is_granted("ROLE_ADMIN") or is_granted("ROLE_MODERATOR")',
         ],
         'add_user' => [
-            'method' => 'POST',
+            'method' => 'PATCH',
             'path' => '/applications/{id}/add_user',
             'controller' => AppAddUserController::class,
+            'openapi_context' => [
+                'summary'     => 'Add user to application',
+                'description' => 'Add user to the application'
+            ],
+            'security' => 'is_granted("ROLE_ADMIN") or is_granted("ROLE_MODERATOR")',
             'denormalization_context' => [
                 'groups' => ['app:add_user']
+            ]
+        ],
+        'user_has_access' => [
+            'method' => 'POST',
+            'path' => '/applications/{id}/user_has_access',
+            'controller' => AppUserHasAccessController::class,
+            'openapi_context' => [
+                'summary'     => 'Check if user has access to the application',
+                'description' => 'Check if user with given email has access to the application'
+            ],
+            'security' => 'is_granted("ROLE_ADMIN") or is_granted("ROLE_MODERATOR")',
+            'denormalization_context' => [
+                'groups' => ['app:has_access:write']
+            ],
+            'normalization_context' => [
+                'groups' => ['app:has_access:read']
             ]
         ]
     ],
@@ -56,6 +78,16 @@ class Application
     #[Groups(['app:add_user'])]
     #[Assert\NotBlank(groups: ['app:add_user'])]
     private $user;
+
+    #[Groups(['app:has_access:write'])]
+    #[Assert\NotBlank(groups: ['app:has_access:write'])]
+    private $email;
+
+    #[Groups(['app:has_access:read'])]
+    private $hasAccess;
+
+    #[Groups(['app:has_access:read'])]
+    private $roles;
 
     public function __construct()
     {
@@ -116,5 +148,41 @@ class Application
     public function getUser()
     {
         return $this->user;
+    }
+
+    public function setEmail(string $email)
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    public function setHasAccess(bool $hasAccess)
+    {
+        $this->hasAccess = $hasAccess;
+
+        return $this;
+    }
+
+    public function getHasAccess(): bool
+    {
+        return $this->hasAccess;
+    }
+
+    public function setRoles(array $roles)
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    public function getRoles(): array
+    {
+        return $this->roles;
     }
 }
