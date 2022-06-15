@@ -9,28 +9,39 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
-    attributes: ['security' => 'is_granted(["ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER"])'],
     collectionOperations: [
-        'get' => ['security' => 'is_granted(["ROLE_ADMIN", "ROLE_MODERATOR"])'],
-        'post' => ['security' => 'is_granted(["ROLE_ADMIN"])'],
+        'get' => [
+            'security' => 'is_granted("ROLE_ADMIN") or is_granted("ROLE_MODERATOR")'
+        ],
+        'post'
     ],
-    itemOperations: []
+    itemOperations: [
+        'get' => ['security' => 'is_granted("USER_VIEW", object)'],
+    ],
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:write']]
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['user:read'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Groups(['user:read', 'user:write'])]
+    #[Assert\NotBlank()]
     private $email;
 
     #[ORM\Column(type: 'json')]
+    #[Groups(['admin:read', 'admin:write'])]
     private $roles = [];
 
     #[ORM\Column(type: 'string')]
@@ -38,6 +49,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\ManyToMany(targetEntity: Application::class, inversedBy: 'users')]
     private $applications;
+
+    #[Assert\Length(min: 8, max: 255, groups: ['userCreate', 'userChangePassword'])]
+    #[Groups(['user:write'])]
+    #[SerializedName('password')]
+    #[Assert\NotBlank()]
+    public $plainPassword;
 
     public function __construct()
     {
@@ -137,7 +154,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
-    #[Assert\Length(min: 8, max: 255, groups: ['userCreate', 'userChangePassword'])]
-    public $plainPassword;
 }

@@ -20,8 +20,13 @@ services:
       - "../src/Entity/"
       - "../src/Kernel.php"
 
-  App\Api\JwtDecorator:
-    decorates: "api_platform.openapi.factory"
-    arguments: ["@.inner"]
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones
+  App\OpenApi\JwtDecorator:
+    decorates: "api_platform.openapi.factory"
+    arguments: ["@.inner"]
+
+  App\Serializer\AdminContextBuilder:
+    decorates: "api_platform.serializer.context_builder"
+    arguments: ['@App\Serializer\AdminContextBuilder.inner']
+    autoconfigure: false
