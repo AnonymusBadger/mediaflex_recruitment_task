@@ -7,17 +7,37 @@ use App\Repository\ApplicationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ApplicationRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    attributes: ['security' => 'is_granted("ROLE_USER")'],
+    collectionOperations: [
+        'get' => [
+            'security' => 'is_granted("ROLE_ADMIN") or is_granted("ROLE_MODERATOR")',
+        ],
+        'post' => [
+            'security' => 'is_granted("ROLE_ADMIN")',
+        ]
+    ],
+    itemOperations: [
+        'get' => [
+            'security' => 'is_granted("ROLE_ADMIN") or is_granted("ROLE_MODERATOR")',
+        ],
+    ],
+    normalizationContext: ['groups' => ['app:read']],
+    denormalizationContext: ['groups' => ['app:write']],
+)]
 class Application
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['app:read'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255, unique: true)]
+    #[Groups(['app:read', 'app:write'])]
     private $name;
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'applications')]
