@@ -5,7 +5,6 @@ namespace App\Serializer;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use App\Entity\User;
 
 final class AdminContextBuilder implements SerializerContextBuilderInterface
 {
@@ -21,7 +20,6 @@ final class AdminContextBuilder implements SerializerContextBuilderInterface
     public function createFromRequest(Request $request, bool $normalization, ?array $extractedAttributes = null): array
     {
         $context = $this->decorated->createFromRequest($request, $normalization, $extractedAttributes);
-        $resourceClass = $context['resource_class'] ?? null;
 
         $isAdmin = $this->authorizationChecker->isGranted('ROLE_ADMIN');
 
