@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\Api\AppAddUserController;
 use App\Repository\ApplicationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ApplicationRepository::class)]
 #[ApiResource(
@@ -24,6 +26,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'get' => [
             'security' => 'is_granted("ROLE_ADMIN") or is_granted("ROLE_MODERATOR")',
         ],
+        'add_user' => [
+            'method' => 'POST',
+            'path' => '/applications/{id}/add_user',
+            'controller' => AppAddUserController::class,
+            'denormalization_context' => [
+                'groups' => ['app:add_user']
+            ]
+        ]
     ],
     normalizationContext: ['groups' => ['app:read']],
     denormalizationContext: ['groups' => ['app:write']],
@@ -42,6 +52,10 @@ class Application
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'applications')]
     private $users;
+
+    #[Groups(['app:add_user'])]
+    #[Assert\NotBlank(groups: ['app:add_user'])]
+    private $user;
 
     public function __construct()
     {
@@ -90,5 +104,17 @@ class Application
         }
 
         return $this;
+    }
+
+    public function setUser(User $user)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getUser()
+    {
+        return $this->user;
     }
 }

@@ -55,6 +55,44 @@ class ApiTestPhpTest extends CustomApiTestCase
         {
         }
 
+        public function testAddUser(): void
+        {
+                $token = $this->getToken('admin@user.com');
+                $client = $this->createClientWithCredentials($token);
+
+                // Create user
+                $client->request('POST', 'api/users', [
+                        'json' => [
+                                'email' => 'user1@user.com',
+                                'password' => 'pass'
+                        ]
+                ]);
+                $this->assertResponseIsSuccessful();
+
+                $userData = $client->getResponse()->toArray();
+
+                // Create app
+                $client->request('POST', 'api/applications', [
+                        'json' => [
+                                'name' => 'foo',
+                        ]
+                ]);
+                $this->assertResponseIsSuccessful();
+
+                $appData = $client->getResponse()->toArray();
+
+                // Add user to app
+                $appAddUserUrl = 'api/applications/' . $appData['id'] . '/add_user';
+
+                $client->request('POST', $appAddUserUrl, [
+                        'json' => [
+                                'user' => $userData['@id'],
+                        ]
+                ]);
+
+                $this->assertResponseIsSuccessful();
+        }
+
         public function testGetApplication(): void
         {
                 // Anonymous
