@@ -66,7 +66,7 @@ class ApplicationRepository extends ServiceEntityRepository
         return $result ? true : false;
     }
 
-    public function getRole(Application | string $app, User | string $user)
+    public function getRole(Application | string $app, User | string $user): ?array
     {
         $appName = is_string($app) ? $app : $app->getName();
         $userEmail = is_string($user) ? $user : $user->getEmail();
@@ -92,7 +92,7 @@ class ApplicationRepository extends ServiceEntityRepository
 
         if (empty($result)) return null;
 
-        return json_decode($result[0]['roles'])[0];
+        return json_decode($result[0]['roles']);
     }
 
     public function findByName(string $name)
