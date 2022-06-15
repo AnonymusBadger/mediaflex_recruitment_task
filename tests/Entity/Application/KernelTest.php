@@ -63,5 +63,31 @@ class KernelTest extends KernelTestCase
 
         $role = $this->appsRepo->getRole('AppWithMany', 'admin@user.com');
         $this->assertNull($role);
+
+        // Takes objects?
+        $app = $this->appsRepo->findByName('AppWithMany');
+        $user = $this->usersRepo->findByEmail('user@user.com');
+
+        $role = $this->appsRepo->getRole($app, $user);
+        $this->assertSame('ROLE_USER', $role);
+    }
+
+    public function testHasUser()
+    {
+        $this->assertTrue(method_exists($this->appsRepo, 'hasUser'));
+
+        $app = $this->appsRepo->findByName('AppWithMany');
+        $user = $this->usersRepo->findByEmail('user@user.com');
+        $mod = $this->usersRepo->findByEmail('moderator@user.com');
+        $admin = $this->usersRepo->findByEmail('admin@user.com');
+
+        $res = $this->appsRepo->hasUser($app, $user);
+        $this->assertTrue($res);
+
+        $res = $this->appsRepo->hasUser($app, $mod);
+        $this->assertTrue($res);
+
+        $res = $this->appsRepo->hasUser($app, $admin);
+        $this->assertFalse($res);
     }
 }

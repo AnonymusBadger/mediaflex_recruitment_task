@@ -43,6 +43,29 @@ class ApplicationRepository extends ServiceEntityRepository
         }
     }
 
+    public function hasUser(Application $app, User $user): bool
+    {
+        $dql = sprintf(
+            '
+            SELECT u
+            FROM %s a, %s u
+            WHERE u.id = %s AND a.id = %s AND u MEMBER OF a.users
+            ',
+            Application::class,
+            User::class,
+            $user->getId(),
+            $app->getId(),
+        );
+
+
+        $result = $this
+            ->getEntityManager()
+            ->createQuery($dql)
+            ->getOneOrNullResult();
+
+        return $result ? true : false;
+    }
+
     public function getRole(Application | string $app, User | string $user)
     {
         $appName = is_string($app) ? $app : $app->getName();
