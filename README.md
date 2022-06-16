@@ -24,11 +24,11 @@ _This will also load data fixtures!_
    `./setup.sh`
 4. Cd to project dir:
    `cd mediaflex_recruitment_task/`
-5. Follow step 6 from **Manual Install**
+5. Follow step 6 from **Manual Setup**
 
 One line: `wget https://raw.githubusercontent.com/AnonymusBadger/mediaflex_recruitment_task/master/setup.sh && chmod +x setup.sh && ./setup.sh && cd mediaflex_recruitment_task/`
 
-:warning: If you get **`MySQL server has gone away`** error follow step 5 from **Manual Install** then **load data fixtures**.
+:warning: If you get **`MySQL server has gone away`** error follow step 5 from **Manual Setup** then **load data fixtures**.
 
 ### Manual
 
