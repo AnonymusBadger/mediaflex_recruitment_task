@@ -43,7 +43,7 @@ One line: `wget https://raw.githubusercontent.com/AnonymusBadger/mediaflex_recru
 5. Execute database migrations:  
    `symfony console doct:mig:mig --no-interaction`
 6. Start server:
-   - a) With TLS: `symfony server:start -d` (requires `symfony server:ca:install` to run if not certificate exists)
+   - a) With TLS: `symfony server:start -d` (requires `symfony server:ca:install` to run if no certificate exists)
    - b) Without TLS: `symfony server:start -d --no-tls`
 7. To browse api documentation go to: `localhost:8000/api/docs`
 
