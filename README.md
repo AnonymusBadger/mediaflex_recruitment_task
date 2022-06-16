@@ -49,7 +49,7 @@ One line: `wget https://raw.githubusercontent.com/AnonymusBadger/mediaflex_recru
 
 ---
 
-### Browser exposed urls:
+## Browser exposed urls:
 
 - `localhost:8000/api/docs` - browse api documentations with the power of SwaggerUI!
 - `localhost:8080` - PhpMyAdmin
