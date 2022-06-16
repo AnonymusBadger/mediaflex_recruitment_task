@@ -1,4 +1,4 @@
-# :warning: This is an example repository! Never expose your secrets publicly! :warning:
+# :warning: This is an example repository! Never expose your [secrets](https://symfony.com/doc/current/configuration/secrets.html) publicly! :warning:
 
 ## Requirements:
 
