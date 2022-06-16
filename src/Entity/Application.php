@@ -32,7 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             'path' => '/applications/{id}/add_user',
             'controller' => AppAddUserController::class,
             'openapi_context' => [
-                'summary'     => 'Add user to application',
+                'summary'     => 'Add user to the application',
                 'description' => 'Add user to the application'
             ],
             'security' => 'is_granted("ROLE_ADMIN") or is_granted("ROLE_MODERATOR")',
