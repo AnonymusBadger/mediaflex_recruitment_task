@@ -1,3 +1,5 @@
+# :warning: This is an example repository! Never expose your secrets publicly! :warning:
+
 ## Requirements:
 
 - PHP 8+
